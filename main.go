@@ -55,6 +55,7 @@ func main() {
 			http.Error(w, err.Error(), 500)
 		}
 	})
+	// Add more routes here.
 
 	port, ok := os.LookupEnv("PORT")
 	if !ok {
