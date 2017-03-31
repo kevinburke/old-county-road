@@ -43,7 +43,15 @@ func (s *static) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	http.ServeContent(w, r, r.URL.Path, s.modTime, bytes.NewReader(bits))
 }
 
-func main() {
+func render(w http.ResponseWriter, tpl *template.Template, name string, data interface{}) {
+	buf := new(bytes.Buffer)
+	if err := tpl.ExecuteTemplate(w, name, data); err != nil {
+		http.Error(w, err.Error(), 500)
+	}
+	w.Write(buf.Bytes())
+}
+
+func NewServeMux() http.Handler {
 	staticServer := &static{
 		modTime: time.Now().UTC(),
 	}
@@ -51,12 +59,14 @@ func main() {
 	r := new(handlers.Regexp)
 	r.Handle(regexp.MustCompile(`(^/static|^/favicon.ico$)`), []string{"GET"}, handlers.GZip(staticServer))
 	r.HandleFunc(regexp.MustCompile(`^/$`), []string{"GET"}, func(w http.ResponseWriter, r *http.Request) {
-		if err := homepageTpl.ExecuteTemplate(w, "homepage", nil); err != nil {
-			http.Error(w, err.Error(), 500)
-		}
+		render(w, homepageTpl, "homepage", nil)
 	})
 	// Add more routes here.
+	return r
+}
 
+func main() {
+	mux := NewServeMux()
 	port, ok := os.LookupEnv("PORT")
 	if !ok {
 		port = "7065"
@@ -66,5 +76,5 @@ func main() {
 		log.Fatal(err)
 	}
 	log.Println("Listening on port", port)
-	http.Serve(ln, handlers.Duration(handlers.Log(handlers.Debug(handlers.UUID(r)))))
+	http.Serve(ln, handlers.Duration(handlers.Log(handlers.Debug(handlers.UUID(mux)))))
 }
