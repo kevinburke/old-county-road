@@ -21,6 +21,8 @@ var homepageTpl *template.Template
 func init() {
 	homepageHTML := assets.MustAssetString("templates/index.html")
 	homepageTpl = template.Must(template.New("homepage").Parse(homepageHTML))
+
+	// Add more templates here.
 }
 
 // Static file HTTP server; all assets are packaged up in the assets directory
