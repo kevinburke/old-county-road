@@ -82,8 +82,8 @@ func opaqueByte(b []byte, secretKey *[32]byte) string {
 	return base64.URLEncoding.EncodeToString(encrypted)
 }
 
-var errTooShort = errors.New("google_oauth_handler: Encrypted string is too short")
-var errInvalidInput = errors.New("google_oauth_handler: Could not decrypt invalid input")
+var errTooShort = errors.New("Encrypted string is too short")
+var errInvalidInput = errors.New("Could not decrypt invalid input")
 
 func unopaqueByte(compressed string, secretKey *[32]byte) ([]byte, error) {
 	encrypted, err := base64.URLEncoding.DecodeString(compressed)
