@@ -2,11 +2,12 @@
 
 This is a starter pack for doing web development with Go:
 
-- Rendering templates,
-- Regex matching incoming routes.
+- Rendering templates
+- Regex matching incoming routes
 - Logging incoming requests
 - Serving static content
 - Watching/restarting the server after changes.
+- Loading configuration from a YAML file.
 
 Feel free to adapt as you see fit.
 
