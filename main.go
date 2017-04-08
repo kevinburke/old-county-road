@@ -18,7 +18,7 @@ import (
 	"time"
 
 	log "github.com/inconshreveable/log15"
-	"github.com/kevinburke/go-html-template/assets"
+	"github.com/kevinburke/go-html-boilerplate/assets"
 	"github.com/kevinburke/handlers"
 	"github.com/kevinburke/rest"
 	yaml "gopkg.in/yaml.v2"
@@ -154,7 +154,7 @@ func main() {
 	}
 	// You can use the secret key with secretbox
 	// (godoc.org/golang.org/x/crypto/nacl/secretbox/) to generate cookies and
-	// secrets.
+	// secrets. See flash.go for examples.
 	_ = key
 
 	mux := NewServeMux()
@@ -176,5 +176,9 @@ func main() {
 		os.Exit(2)
 	}
 	logger.Info("Started server", "port", c.Port)
-	http.Serve(ln, handlers.Duration(handlers.Log(handlers.UUID(mux))))
+	mux = handlers.UUID(mux)
+	mux = handlers.Server(mux, "go-html-boilerplate")
+	mux = handlers.Log(mux)
+	mux = handlers.Duration(mux)
+	http.Serve(ln, mux)
 }

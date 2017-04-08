@@ -1,13 +1,15 @@
-# go html templates
+# Go html boilerplate
 
-This is a starter pack for doing web development with Go:
+This is a starter pack for doing web development with Go, with support for some
+of the things you'll usually want to add to an HTML web server:
 
-- Rendering templates
-- Regex matching incoming routes
-- Logging incoming requests
+- Adding templates and rendering them
+- Regex matching for routes
+- Logging requests responses
 - Serving static content
-- Watching/restarting the server after changes.
-- Loading configuration from a YAML file.
+- Watching/restarting the server after changes to CSS/templates
+- Loading configuration from a config file
+- Flash success and error messages
 
 Feel free to adapt as you see fit.
 
