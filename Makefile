@@ -13,6 +13,7 @@ vet:
 ifndef STATICCHECK
 	go get -u honnef.co/go/tools/cmd/staticcheck
 endif
+	staticcheck ./...
 	go vet ./...
 
 test: vet
@@ -22,7 +23,10 @@ race-test: vet
 	go test -race ./...
 
 serve:
-	go run main.go
+	go install . && go-html-boilerplate
+
+generate_cert:
+	go run "$$(go env GOROOT)/src/crypto/tls/generate_cert.go" --host=localhost:7065,127.0.0.1:7065 --ecdsa-curve=P256 --ca=true
 
 assets:
 ifndef GO_BINDATA

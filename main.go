@@ -2,14 +2,10 @@ package main
 
 import (
 	"bytes"
-	"crypto/rand"
-	"encoding/hex"
 	"errors"
 	"flag"
 	"html/template"
-	"io"
 	"io/ioutil"
-	"net"
 	"net/http"
 	"os"
 	"regexp"
@@ -75,6 +71,7 @@ func NewServeMux() http.Handler {
 	r := new(handlers.Regexp)
 	r.Handle(regexp.MustCompile(`(^/static|^/favicon.ico$)`), []string{"GET"}, handlers.GZip(staticServer))
 	r.HandleFunc(regexp.MustCompile(`^/$`), []string{"GET"}, func(w http.ResponseWriter, r *http.Request) {
+		push(w, "/static/style.css", "style")
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		render(w, homepageTpl, "homepage", nil)
 	})
@@ -100,38 +97,15 @@ type FileConfig struct {
 	// If a server key is present, but invalid, the server will not start.
 	SecretKey string `yaml:"secret_key"`
 
-	Port int `yaml:"port"`
+	// Port to listen on. Set to 0 to choose a port at random. If unspecified,
+	// defaults to 7065.
+	Port *int `yaml:"port"`
+
+	// For TLS configuration.
+	CertFile string `yaml:"cert_file"`
+	KeyFile  string `yaml:"key_file"`
 
 	// Add other configuration settings here.
-}
-
-// NewRandomKey returns a random key or panics if one cannot be provided.
-func NewRandomKey() *[32]byte {
-	key := new([32]byte)
-	if _, err := io.ReadFull(rand.Reader, key[:]); err != nil {
-		panic(err)
-	}
-	return key
-}
-
-// getSecretKey produces a valid [32]byte secret key or returns an error. If
-// hexKey is the empty string, a valid 32 byte key will be randomly generated
-// and returned. If hexKey is invalid, an error is returned.
-func getSecretKey(hexKey string) (*[32]byte, error) {
-	if hexKey == "" {
-		return NewRandomKey(), nil
-	}
-
-	if len(hexKey) != 64 {
-		return nil, errWrongLength
-	}
-	secretKeyBytes, err := hex.DecodeString(hexKey)
-	if err != nil {
-		return nil, err
-	}
-	secretKey := new([32]byte)
-	copy(secretKey[:], secretKeyBytes)
-	return secretKey, nil
 }
 
 func main() {
@@ -154,31 +128,41 @@ func main() {
 	}
 	// You can use the secret key with secretbox
 	// (godoc.org/golang.org/x/crypto/nacl/secretbox/) to generate cookies and
-	// secrets. See flash.go for examples.
+	// secrets. See flash.go and crypto.go for examples.
 	_ = key
 
 	mux := NewServeMux()
-	if c.Port == 0 {
+	if c.Port == nil {
 		port, ok := os.LookupEnv("PORT")
 		if ok {
-			c.Port, err = strconv.Atoi(port)
+			*c.Port, err = strconv.Atoi(port)
 			if err != nil {
 				logger.Error("Invalid port", "err", err, "port", port)
 				os.Exit(2)
 			}
 		} else {
-			c.Port = DefaultPort
+			*c.Port = DefaultPort
 		}
 	}
-	ln, err := net.Listen("tcp", ":"+strconv.Itoa(c.Port))
-	if err != nil {
-		logger.Error("Couldn't listen on port", "err", err)
+	if c.CertFile == "" {
+		c.CertFile = "cert.pem"
+	}
+	if _, err := os.Stat(c.CertFile); os.IsNotExist(err) {
+		logger.Error("Could not find a cert file; generate using 'make generate_cert'", "file", c.CertFile)
 		os.Exit(2)
 	}
-	logger.Info("Started server", "port", c.Port)
+	if c.KeyFile == "" {
+		c.KeyFile = "key.pem"
+	}
+	if _, err := os.Stat(c.KeyFile); os.IsNotExist(err) {
+		logger.Error("Could not find a key file; generate using 'make generate_cert'", "file", c.KeyFile)
+		os.Exit(2)
+	}
 	mux = handlers.UUID(mux)
 	mux = handlers.Server(mux, "go-html-boilerplate")
 	mux = handlers.Log(mux)
 	mux = handlers.Duration(mux)
-	http.Serve(ln, mux)
+	logger.Info("Starting server", "port", *c.Port)
+	listenErr := http.ListenAndServeTLS("127.0.0.1:"+strconv.Itoa(*c.Port), c.CertFile, c.KeyFile, mux)
+	logger.Error("server shut down", "err", listenErr)
 }
