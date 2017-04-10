@@ -27,3 +27,5 @@ examining the `init` function in main.go.
 Static files go in the "static" folder. Run `make assets` to recompile them into
 the binary. Run `make watch` to restart the server after you make changes to the
 assets directory.
+
+[post]: https://kev.inburke.com/kevin/go-web-development/?github
