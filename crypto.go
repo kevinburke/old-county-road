@@ -12,6 +12,8 @@ import (
 	"golang.org/x/crypto/nacl/secretbox"
 )
 
+var errWrongLength = errors.New("Secret key has wrong length. Should be a 64-byte hex string")
+
 // NewRandomKey returns a random key or panics if one cannot be provided.
 func NewRandomKey() *[32]byte {
 	key := new([32]byte)
