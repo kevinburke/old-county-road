@@ -31,7 +31,7 @@ import (
 var DefaultPort = 7065
 
 // The server's Version.
-const Version = "0.0"
+const Version = "0.1"
 
 var errWrongLength = errors.New("Secret key has wrong length. Should be a 64-byte hex string")
 var homepageTpl *template.Template
