@@ -2,6 +2,7 @@
 
 SHELL = /bin/bash
 
+BENCHSTAT := $(shell command -v benchstat)
 BUMP_VERSION := $(shell command -v bump_version)
 GO_BINDATA := $(shell command -v go-bindata)
 JUSTRUN := $(shell command -v justrun)
@@ -22,6 +23,12 @@ test: vet
 
 race-test: vet
 	go test -race ./...
+
+bench:
+ifndef BENCHSTAT
+	go get -u golang.org/x/perf/cmd/benchstat
+endif
+	tmp=$$(mktemp); go list ./... | grep -v vendor | xargs go test -benchtime=2s -bench=. -run='^$$' > "$$tmp" 2>&1 && benchstat "$$tmp"
 
 serve:
 	go install . && go-html-boilerplate
