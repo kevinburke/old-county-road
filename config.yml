@@ -1,4 +1,4 @@
-port: 7065
+# port: 7065
 
 # Run "make generate_cert" to generate these files.
 cert_file: cert.pem

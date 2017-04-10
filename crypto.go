@@ -1,5 +1,7 @@
 package main
 
+// Helpers for two-way encryption with a secret key.
+
 import (
 	"crypto/rand"
 	"encoding/base64"

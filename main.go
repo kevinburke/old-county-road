@@ -1,3 +1,9 @@
+// go-html-boilerplate loads configuration from a file and starts a HTTP server
+// that can render HTML templates and static assets.
+//
+// See config.yml for an explanation of the configuration options for the
+// server, and the Makefile for various tasks you can run in coordination with
+// the server (run tests, build assets, start the server).
 package main
 
 import (
@@ -22,11 +28,10 @@ import (
 )
 
 // DefaultPort is the listening port if no other port is specified.
-const DefaultPort = 7065
+var DefaultPort = 7065
 
 var errWrongLength = errors.New("Secret key has wrong length. Should be a 64-byte hex string")
 var homepageTpl *template.Template
-var cfg = flag.String("config", "config.yml", "Path to a config file")
 var logger log.Logger
 
 func init() {
@@ -56,14 +61,18 @@ func (s *static) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	http.ServeContent(w, r, r.URL.Path, s.modTime, bytes.NewReader(bits))
 }
 
-func render(w http.ResponseWriter, tpl *template.Template, name string, data interface{}) {
+// Render a template, or a server error.
+func render(w http.ResponseWriter, r *http.Request, tpl *template.Template, name string, data interface{}) {
 	buf := new(bytes.Buffer)
 	if err := tpl.ExecuteTemplate(buf, name, data); err != nil {
-		http.Error(w, err.Error(), 500)
+		rest.ServerError(w, r, err)
+		return
 	}
 	w.Write(buf.Bytes())
 }
 
+// NewServeMux returns a HTTP handler that covers all routes known to the
+// server.
 func NewServeMux() http.Handler {
 	staticServer := &static{
 		modTime: time.Now().UTC(),
@@ -74,9 +83,11 @@ func NewServeMux() http.Handler {
 	r.HandleFunc(regexp.MustCompile(`^/$`), []string{"GET"}, func(w http.ResponseWriter, r *http.Request) {
 		push(w, "/static/style.css", "style")
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		render(w, homepageTpl, "homepage", nil)
+		render(w, r, homepageTpl, "homepage", nil)
 	})
-	// Add more routes here.
+	// Add more routes here. Routes not matched will get a 404 error page.
+	// Call rest.RegisterHandler(404, http.HandlerFunc) to provide your own 404
+	// page instead of the default.
 	return r
 }
 
@@ -112,6 +123,8 @@ type FileConfig struct {
 	// Add other configuration settings here.
 }
 
+var cfg = flag.String("config", "config.yml", "Path to a config file")
+
 func main() {
 	flag.Parse()
 	data, err := ioutil.ReadFile(*cfg)
@@ -138,20 +151,21 @@ func main() {
 	if c.Port == nil {
 		port, ok := os.LookupEnv("PORT")
 		if ok {
-			*c.Port, err = strconv.Atoi(port)
+			iPort, err := strconv.Atoi(port)
 			if err != nil {
 				logger.Error("Invalid port", "err", err, "port", port)
 				os.Exit(2)
 			}
+			c.Port = &iPort
 		} else {
-			*c.Port = DefaultPort
+			c.Port = &DefaultPort
 		}
 	}
 	mux := NewServeMux()
-	mux = handlers.UUID(mux)
-	mux = handlers.Server(mux, "go-html-boilerplate")
-	mux = handlers.Log(mux)
-	mux = handlers.Duration(mux)
+	mux = handlers.UUID(mux)                          // add UUID header
+	mux = handlers.Server(mux, "go-html-boilerplate") // add Server header
+	mux = handlers.Log(mux)                           // log requests/responses
+	mux = handlers.Duration(mux)                      // add Duration header
 	addr := ":" + strconv.Itoa(*c.Port)
 	if c.HTTPOnly {
 		ln, err := net.Listen("tcp", addr)
@@ -176,7 +190,8 @@ func main() {
 			logger.Error("Could not find a key file; generate using 'make generate_cert'", "file", c.KeyFile)
 			os.Exit(2)
 		}
-		listenErr := http.ListenAndServeTLS("127.0.0.1:"+strconv.Itoa(*c.Port), c.CertFile, c.KeyFile, mux)
+		logger.Info("Starting server", "port", *c.Port)
+		listenErr := http.ListenAndServeTLS(addr, c.CertFile, c.KeyFile, mux)
 		logger.Error("server shut down", "err", listenErr)
 	}
 }
