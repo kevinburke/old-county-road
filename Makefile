@@ -4,6 +4,7 @@ SHELL = /bin/bash
 
 BENCHSTAT := $(shell command -v benchstat)
 BUMP_VERSION := $(shell command -v bump_version)
+DIFFER := $(shell command -v differ)
 GO_BINDATA := $(shell command -v go-bindata)
 JUSTRUN := $(shell command -v justrun)
 STATICCHECK := $(shell command -v staticcheck)
@@ -23,6 +24,12 @@ test: vet
 
 race-test: vet
 	go test -race ./...
+
+diff:
+ifndef DIFFER
+	go get -u github.com/kevinburke/differ
+endif
+	differ $(MAKE) assets
 
 bench:
 ifndef BENCHSTAT
@@ -49,7 +56,7 @@ endif
 	justrun -v --delay=100ms -c 'make assets serve' $(WATCH_TARGETS)
 
 # Run "GITHUB_TOKEN=my-token make release version=0.x.y" to release a new version.
-release: test
+release: diff race-test
 ifndef version
 	@echo "Please provide a version"
 	exit 1
