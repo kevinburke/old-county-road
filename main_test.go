@@ -33,7 +33,7 @@ func BenchmarkHomepage(b *testing.B) {
 			b.Fatal(err)
 		}
 		if res.StatusCode != 200 {
-			b.Fatal("GET /: expected code 200, got %d", res.StatusCode)
+			b.Fatalf("GET /: expected code 200, got %d", res.StatusCode)
 		}
 		io.Copy(ioutil.Discard, res.Body)
 		res.Body.Close()
