@@ -1,5 +1,8 @@
 package main
 
+// Helper functions for setting a flash message as a cookie, and then reading
+// that flash message in another request.
+
 import (
 	"net/http"
 	"time"

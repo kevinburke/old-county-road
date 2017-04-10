@@ -30,6 +30,9 @@ import (
 // DefaultPort is the listening port if no other port is specified.
 var DefaultPort = 7065
 
+// The server's Version.
+const Version = "0.0"
+
 var errWrongLength = errors.New("Secret key has wrong length. Should be a 64-byte hex string")
 var homepageTpl *template.Template
 var logger log.Logger
@@ -113,7 +116,8 @@ type FileConfig struct {
 	// defaults to 7065.
 	Port *int `yaml:"port"`
 
-	// Set to true to listen for HTTP traffic (instead of TLS traffic)
+	// Set to true to listen for HTTP traffic (instead of TLS traffic). Note
+	// you need to terminate TLS to use HTTP server push.
 	HTTPOnly bool `yaml:"http_only"`
 
 	// For TLS configuration.
@@ -162,10 +166,10 @@ func main() {
 		}
 	}
 	mux := NewServeMux()
-	mux = handlers.UUID(mux)                          // add UUID header
-	mux = handlers.Server(mux, "go-html-boilerplate") // add Server header
-	mux = handlers.Log(mux)                           // log requests/responses
-	mux = handlers.Duration(mux)                      // add Duration header
+	mux = handlers.UUID(mux)                                   // add UUID header
+	mux = handlers.Server(mux, "go-html-boilerplate/"+Version) // add Server header
+	mux = handlers.Log(mux)                                    // log requests/responses
+	mux = handlers.Duration(mux)                               // add Duration header
 	addr := ":" + strconv.Itoa(*c.Port)
 	if c.HTTPOnly {
 		ln, err := net.Listen("tcp", addr)
