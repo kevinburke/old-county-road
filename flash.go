@@ -5,6 +5,7 @@ package main
 
 import (
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -25,7 +26,7 @@ func setCookie(w http.ResponseWriter, msg string, name string, key *[32]byte) {
 	c := &http.Cookie{
 		Name:     name,
 		Path:     "/",
-		Value:    opaque(msg, key),
+		Value:    opaque(name+"|"+msg, key),
 		HttpOnly: true,
 	}
 	http.SetCookie(w, c)
@@ -53,7 +54,11 @@ func getCookie(w http.ResponseWriter, r *http.Request, name string, key *[32]byt
 	if err != nil {
 		return ""
 	}
-	return msg
+	if !strings.HasPrefix(msg, name+"|") {
+		clearCookie(w, name)
+		return ""
+	}
+	return msg[len(name)+1:]
 }
 
 func clearCookie(w http.ResponseWriter, name string) {
