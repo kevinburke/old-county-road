@@ -13,7 +13,7 @@ import (
 func push(w http.ResponseWriter, resource string, destination string) {
 	pusher, ok := w.(http.Pusher)
 	if ok {
-		if err := pusher.Push("/static/style.css", nil); err == nil {
+		if err := pusher.Push(resource, nil); err == nil {
 			return
 		}
 	}
