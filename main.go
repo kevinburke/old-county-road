@@ -175,7 +175,7 @@ func main() {
 			logger.Error("Error listening", "addr", addr, "err", err)
 			os.Exit(2)
 		}
-		logger.Info("Started server", "port", *c.Port)
+		logger.Info("Started server", "protocol", "http", "port", *c.Port)
 		http.Serve(ln, mux)
 	} else {
 		if c.CertFile == "" {
@@ -192,7 +192,7 @@ func main() {
 			logger.Error("Could not find a key file; generate using 'make generate_cert'", "file", c.KeyFile)
 			os.Exit(2)
 		}
-		logger.Info("Starting server", "port", *c.Port)
+		logger.Info("Starting server", "protocol", "https", "port", *c.Port)
 		listenErr := http.ListenAndServeTLS(addr, c.CertFile, c.KeyFile, mux)
 		logger.Error("server shut down", "err", listenErr)
 	}
