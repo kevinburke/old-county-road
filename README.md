@@ -25,7 +25,16 @@ Templates go in the "templates" folder; you can see how they're loaded by
 examining the `init` function in main.go.
 
 Static files go in the "static" folder. Run `make assets` to recompile them into
-the binary. Run `make watch` to restart the server after you make changes to the
-assets directory.
+the binary.
 
+### Watching for changes
+
+Run `make watch` to restart the server after you make changes to the assets
+directory.
+
+If you are on a Mac, be sure to **add this folder to the Spotlight privacy
+list**, or file modify events will [fire a second time when Spotlight indexes
+updates][fsnotify].
+
+[fsnotify]: https://github.com/fsnotify/fsnotify/issues/15
 [post]: https://kev.inburke.com/kevin/go-web-development/?github
