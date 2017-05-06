@@ -1,7 +1,6 @@
 package main
 
 import (
-	"io"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -25,8 +24,8 @@ func TestServer(t *testing.T) {
 func BenchmarkHomepage(b *testing.B) {
 	mux := NewServeMux()
 	s := httptest.NewServer(mux)
-	b.ResetTimer()
 	b.ReportAllocs()
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		res, err := http.Get(s.URL)
 		if err != nil {
@@ -35,7 +34,25 @@ func BenchmarkHomepage(b *testing.B) {
 		if res.StatusCode != 200 {
 			b.Fatalf("GET /: expected code 200, got %d", res.StatusCode)
 		}
-		io.Copy(ioutil.Discard, res.Body)
+		n, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			b.Fatal(err)
+		}
+		b.SetBytes(int64(len(n)))
 		res.Body.Close()
+	}
+}
+
+var sink string
+
+// Just curious about how fast secretbox encryption is
+func BenchmarkOpaque(b *testing.B) {
+	key := NewRandomKey()
+	secret := "this is an average length message, about sixty characters long."
+	b.SetBytes(int64(len(secret)))
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		sink = opaque(secret, key)
 	}
 }
