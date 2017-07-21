@@ -22,6 +22,7 @@ import (
 	log "github.com/inconshreveable/log15"
 	"github.com/kevinburke/go-html-boilerplate/assets"
 	"github.com/kevinburke/handlers"
+	"github.com/kevinburke/nacl"
 	"github.com/kevinburke/rest"
 	yaml "gopkg.in/yaml.v2"
 )
@@ -140,13 +141,13 @@ func main() {
 		logger.Error("Couldn't find config file", "err", err)
 		os.Exit(2)
 	}
-	key, err := getSecretKey(c.SecretKey)
+	key, err := nacl.Load(c.SecretKey)
 	if err != nil {
 		logger.Error("Error getting secret key", "err", err)
 		os.Exit(2)
 	}
 	// You can use the secret key with secretbox
-	// (godoc.org/golang.org/x/crypto/nacl/secretbox/) to generate cookies and
+	// (godoc.org/github.com/kevinburke/nacl/secretbox/) to generate cookies and
 	// secrets. See flash.go and crypto.go for examples.
 	_ = key
 
