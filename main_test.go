@@ -6,6 +6,8 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/kevinburke/nacl"
 )
 
 func TestServer(t *testing.T) {
@@ -47,7 +49,7 @@ var sink string
 
 // Just curious about how fast secretbox encryption is
 func BenchmarkOpaque(b *testing.B) {
-	key := NewRandomKey()
+	key := nacl.NewKey()
 	secret := "this is an average length message, about sixty characters long."
 	b.SetBytes(int64(len(secret)))
 	b.ReportAllocs()
