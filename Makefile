@@ -72,7 +72,7 @@ ifndef GITHUB_TOKEN
 	@echo "Please set GITHUB_TOKEN in the environment"
 	exit 1
 endif
-	bump_version --version=$(version) main.go
+	$(BUMP_VERSION) --version=$(version) main.go
 	git push origin --tags
 	mkdir -p releases/$(version)
 	# Change the binary names below to match your tool name
