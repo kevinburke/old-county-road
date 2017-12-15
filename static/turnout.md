@@ -107,40 +107,38 @@ and collecting email from responding residents, and speaking with drivers about
 to turn onto Old County Road.
 
 - Kevin Burke (petitioner), 639, left side
-- Sravani Burela, 635, left side
-- Gouthami Kondakindi, 635, left side.
-- Judy Castillo, 621, both sides.
-- Saad Saleem, 625, left side.
-- Laura Kashiwase, 639, left side.
-- William Hardin, 635, both sides.
-- Nicole Geao, 625, N/A
-- Wah-Shu Lai, 639, left side.
-- Gary Doulez, 639, left side. (last name a bit mangled; see photo)
-- Maria Gimenez, 635, left side.
-- Arnold Benet, 621, left side.
-- Aidee Ruiz, 639, left side.
-- Liang Kang, 635, left side.
-- Jimi (unreadable), 635, left side.
-- Jennifer Russo, 625, left side.
-- Estefani Gomez, 625, left side
+- SB, 635, left side
+- GK, 635, left side.
+- JC, 621, both sides.
+- SS, 625, left side.
+- LK, 639, left side.
+- WH, 635, both sides.
+- NG, 625, N/A
+- WL, 639, left side.
+- GD, 639, left side. (last name a bit mangled; see photo)
+- MG, 635, left side.
+- AB, 621, left side.
+- AR, 639, left side.
+- LK, 635, left side.
+- JZ, 635, left side.
+- JR, 625, left side.
+- EG, 625, left side
 - Rafael Galvez, 641, left side. Rafael Galvez is the apartment complex manager.
 
-Here are the physical signatures I collected; I also have emails.
-
-<img class="post-img" src="/static/signatures.jpg" />
+I can share with you privately the physical signatures and emails I collected.
 
 #### Quotes from Residents
 
-**Gouthami Kondakindi:** "I escaped a few accidents trying to take the turn."
+**GK:** "I escaped a few accidents trying to take the turn."
 
 **Joan,** has lived here 6 years, does not make left turns because it's too
 dangerous. She turns right and makes a U-turn at the JK Automotive shop 400
 yards down the road. "Left turn is taking your life into your hands. It's
 crazy," said Joan. "I have been almost hit a number of times."
 
-**Saad Saleem:** "It is near impossible to see the oncoming cars."
+**SS:** "It is near impossible to see the oncoming cars."
 
-**Laura Kashiwase:** "My strategy has been to inch out which causes some
+**LK:** "My strategy has been to inch out which causes some
 oncoming cars to get mad. Once I'm out far enough I hit the gas and hope. It's
 extremely dangerous but there aren't any other options."
 
@@ -206,6 +204,11 @@ parking would encourage public transit, walking, biking, carpooling. These
 actions would fit with the city's [Climate Action Plan][cap].
 
 [cap]: http://www.belmont.gov/city-hall/community-development/climate-action-plan#ad-image-0
+
+## Contact
+
+To contact the author of the petition or to subscribe to updates, email
+[kev@inburke.com](mailto:kev@inburke.com).
 
 <script type="text/javascript" src="/static/chart.js"></script>
 <script type="text/javascript" src="/static/chart-safe.js"></script>

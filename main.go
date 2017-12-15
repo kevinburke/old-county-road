@@ -11,7 +11,6 @@ import (
 	"flag"
 	"html/template"
 	"io/ioutil"
-	"net"
 	"net/http"
 	"os"
 	"regexp"
@@ -55,6 +54,9 @@ func (s *static) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path == "/favicon.ico" {
 		r.URL.Path = "/static/favicon.ico"
 	}
+	if r.URL.Path == "/" {
+		r.URL.Path = "/static/turnout.html"
+	}
 	bits, err := assets.Asset(strings.TrimPrefix(r.URL.Path, "/"))
 	if err != nil {
 		rest.NotFound(w, r)
@@ -81,12 +83,7 @@ func NewServeMux() http.Handler {
 	}
 
 	r := new(handlers.Regexp)
-	r.Handle(regexp.MustCompile(`(^/static|^/favicon.ico$)`), []string{"GET"}, handlers.GZip(staticServer))
-	r.HandleFunc(regexp.MustCompile(`^/$`), []string{"GET"}, func(w http.ResponseWriter, r *http.Request) {
-		push(w, "/static/style.css", "style")
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		render(w, r, homepageTpl, "homepage", nil)
-	})
+	r.Handle(regexp.MustCompile(`(^/$|^/static|^/favicon.ico$)`), []string{"GET"}, handlers.GZip(staticServer))
 	// Add more routes here. Routes not matched will get a 404 error page.
 	// Call rest.RegisterHandler(404, http.HandlerFunc) to provide your own 404
 	// page instead of the default.
@@ -128,7 +125,7 @@ type FileConfig struct {
 
 var cfg = flag.String("config", "config.yml", "Path to a config file")
 
-func main() {
+func commonMain() (*FileConfig, http.Handler) {
 	flag.Parse()
 	data, err := ioutil.ReadFile(*cfg)
 	c := new(FileConfig)
@@ -165,36 +162,11 @@ func main() {
 		}
 	}
 	mux := NewServeMux()
-	mux = handlers.UUID(mux)                                   // add UUID header
-	mux = handlers.Server(mux, "go-html-boilerplate/"+Version) // add Server header
-	mux = handlers.Log(mux)                                    // log requests/responses
-	mux = handlers.Duration(mux)                               // add Duration header
-	addr := ":" + strconv.Itoa(*c.Port)
-	if c.HTTPOnly {
-		ln, err := net.Listen("tcp", addr)
-		if err != nil {
-			logger.Error("Error listening", "addr", addr, "err", err)
-			os.Exit(2)
-		}
-		logger.Info("Started server", "protocol", "http", "port", *c.Port)
-		http.Serve(ln, mux)
-	} else {
-		if c.CertFile == "" {
-			c.CertFile = "cert.pem"
-		}
-		if _, err := os.Stat(c.CertFile); os.IsNotExist(err) {
-			logger.Error("Could not find a cert file; generate using 'make generate_cert'", "file", c.CertFile)
-			os.Exit(2)
-		}
-		if c.KeyFile == "" {
-			c.KeyFile = "key.pem"
-		}
-		if _, err := os.Stat(c.KeyFile); os.IsNotExist(err) {
-			logger.Error("Could not find a key file; generate using 'make generate_cert'", "file", c.KeyFile)
-			os.Exit(2)
-		}
-		logger.Info("Starting server", "protocol", "https", "port", *c.Port)
-		listenErr := http.ListenAndServeTLS(addr, c.CertFile, c.KeyFile, mux)
-		logger.Error("server shut down", "err", listenErr)
-	}
+	mux = handlers.UUID(mux)                               // add UUID header
+	mux = handlers.Server(mux, "old-county-road/"+Version) // add Server header
+	mux = handlers.Log(mux)                                // log requests/responses
+	mux = handlers.Duration(mux)                           // add Duration header
+	mux = handlers.STS(mux)                                // add STS header
+	mux = handlers.RedirectProto(mux)                      // add STS header
+	return c, mux
 }
