@@ -20,15 +20,15 @@ import (
 	"time"
 
 	log "github.com/inconshreveable/log15"
-	"github.com/kevinburke/go-html-boilerplate/assets"
 	"github.com/kevinburke/handlers"
 	"github.com/kevinburke/nacl"
+	"github.com/kevinburke/old-county-road/assets"
 	"github.com/kevinburke/rest"
 	yaml "gopkg.in/yaml.v2"
 )
 
 // DefaultPort is the listening port if no other port is specified.
-var DefaultPort = 7065
+var DefaultPort = 4965
 
 // The server's Version.
 const Version = "0.4"

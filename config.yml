@@ -1,4 +1,6 @@
-port: 7065
+port: 4965
+
+secret_key: 12c6480f53a39d9fb9c8b5ba6f6a6095ff5099fc7c9e46f000d35113878bae11
 
 # Run "make generate_cert" to generate these files.
 cert_file: cert.pem

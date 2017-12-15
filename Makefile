@@ -10,8 +10,10 @@ JUSTRUN := $(GOPATH)/bin/justrun
 MEGACHECK := $(GOPATH)/bin/megacheck
 RELEASE := $(GOPATH)/bin/github-release
 
+GO_FILES := $(shell find . -name '*.go')
+
 # Add files that change frequently to this list.
-WATCH_TARGETS = static/style.css templates/index.html main.go
+WATCH_TARGETS = static/style.css templates/index.html main.go static/chart.js static/chart-safe.js static/turnout.md
 
 test: vet
 	go test ./...
@@ -20,7 +22,7 @@ $(MEGACHECK):
 	go get honnef.co/go/tools/cmd/megacheck
 
 vet: $(MEGACHECK)
-	$(MEGACHECK) --ignore='github.com/kevinburke/go-html-boilerplate/*.go:U1000' ./...
+	$(MEGACHECK) --ignore='github.com/kevinburke/old-county-road/*.go:U1000' ./...
 	go vet ./...
 
 race-test: vet
@@ -35,16 +37,22 @@ $(BENCHSTAT):
 bench: | $(BENCHSTAT)
 	tmp=$$(mktemp); go list ./... | grep -v vendor | xargs go test -benchtime=2s -bench=. -run='^$$' > "$$tmp" 2>&1 && $(BENCHSTAT) "$$tmp"
 
-serve:
-	go install . && go-html-boilerplate
+$(GOPATH)/bin/old-county-road: $(GO_FILES)
+	go install .
+
+serve: $(GOPATH)/bin/old-county-road
+	$(GOPATH)/bin/old-county-road
 
 generate_cert:
 	go run "$$(go env GOROOT)/src/crypto/tls/generate_cert.go" --host=localhost:7065,127.0.0.1:7065 --ecdsa-curve=P256 --ca=true
 
 $(GO_BINDATA):
-	go get -u github.com/jteeuwen/go-bindata/...
+	go get -u github.com/kevinburke/go-bindata/...
 
-assets: | $(GO_BINDATA)
+static/turnout.html: static/turnout.md
+	markdown static/turnout.md > static/turnout.html
+
+assets: static/turnout.html | $(GO_BINDATA)
 	$(GO_BINDATA) -o=assets/bindata.go --nocompress --nometadata --pkg=assets templates/... static/...
 
 $(JUSTRUN):
