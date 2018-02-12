@@ -32,12 +32,9 @@ var DefaultPort = 4965
 // The server's Version.
 const Version = "0.4"
 
-var homepageTpl *template.Template
 var logger log.Logger
 
 func init() {
-	homepageHTML := assets.MustAssetString("templates/index.html")
-	homepageTpl = template.Must(template.New("homepage").Parse(homepageHTML))
 	logger = handlers.Logger
 
 	// Add more templates here.
