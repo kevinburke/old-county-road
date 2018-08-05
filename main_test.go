@@ -18,8 +18,8 @@ func TestServer(t *testing.T) {
 	if w.Code != 200 {
 		t.Errorf("GET /: got code %d, want 200", w.Code)
 	}
-	if body := w.Body.String(); !strings.Contains(body, "Hello World") {
-		t.Errorf("GET /: expected 'Hello World' in body, got %s", body)
+	if body := w.Body.String(); !strings.Contains(body, "Old County Road") {
+		t.Errorf("GET /: expected 'Old County Road' in body, got %s", body)
 	}
 }
 
